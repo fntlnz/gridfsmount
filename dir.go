@@ -29,10 +29,7 @@ func (dir *Dir) Lookup(ctx context.Context, name string) (fs.Node, error) {
 
 	defer file.Close()
 
-	return &File{
-		ds:   dir.ds,
-		name: file.Name(),
-	}, nil
+	return NewFile(dir.ds, file.Name()), nil
 
 }
 
@@ -64,10 +61,7 @@ func (dir *Dir) Create(ctx context.Context, req *fuse.CreateRequest, resp *fuse.
 
 	defer file.Close()
 
-	node := &File{
-		ds:   dir.ds,
-		name: file.Name(),
-	}
+	node := NewFile(dir.ds, file.Name())
 
 	return node, node, nil
 
