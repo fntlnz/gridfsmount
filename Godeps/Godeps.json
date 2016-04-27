@@ -1,0 +1,52 @@
+{
+	"ImportPath": "github.com/fntlnz/gridfsmount",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v62",
+	"Deps": [
+		{
+			"ImportPath": "bazil.org/fuse",
+			"Rev": "5d02b06737b3b3c2e6a44e03348b6f2b44aa6835"
+		},
+		{
+			"ImportPath": "bazil.org/fuse/fs",
+			"Rev": "5d02b06737b3b3c2e6a44e03348b6f2b44aa6835"
+		},
+		{
+			"ImportPath": "bazil.org/fuse/fuseutil",
+			"Rev": "5d02b06737b3b3c2e6a44e03348b6f2b44aa6835"
+		},
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.9.0-13-g74bde9e",
+			"Rev": "74bde9ea4c5b2c78995da8ed56d37e75644dc941"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "6acef71eb69611914f7a30939ea9f6e194c78172"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/unix",
+			"Rev": "9d4e42a20653790449273b3c85e67d6d8bae6e2e"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2",
+			"Comment": "r2016.02.04-1-gb6e2fa3",
+			"Rev": "b6e2fa371e64216a45e61072a96d4e3859f169da"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/bson",
+			"Comment": "r2016.02.04-1-gb6e2fa3",
+			"Rev": "b6e2fa371e64216a45e61072a96d4e3859f169da"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/internal/sasl",
+			"Comment": "r2016.02.04-1-gb6e2fa3",
+			"Rev": "b6e2fa371e64216a45e61072a96d4e3859f169da"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/internal/scram",
+			"Comment": "r2016.02.04-1-gb6e2fa3",
+			"Rev": "b6e2fa371e64216a45e61072a96d4e3859f169da"
+		}
+	]
+}
