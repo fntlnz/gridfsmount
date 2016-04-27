@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/fntlnz/gridfsmount/datastore"
 
 	"bazil.org/fuse"
@@ -29,8 +30,14 @@ func (dir *Dir) Lookup(ctx context.Context, name string) (fs.Node, error) {
 
 	defer file.Close()
 
-	return NewFile(dir.ds, file.Name()), nil
+	node, err := NewFile(dir.ds, file.Name())
 
+	if err != nil {
+		logrus.Errorf("Error creating file: %s", err.Error())
+		return nil, fuse.EIO
+	}
+
+	return node, nil
 }
 
 func (dir *Dir) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
@@ -56,12 +63,18 @@ func (dir *Dir) Create(ctx context.Context, req *fuse.CreateRequest, resp *fuse.
 	file, err := dir.ds.Create(req.Name)
 
 	if err != nil {
+		logrus.Errorf("An error occurred creating file into the datastore: %s", err.Error())
 		return nil, nil, fuse.EIO
 	}
 
 	defer file.Close()
 
-	node := NewFile(dir.ds, file.Name())
+	node, err := NewFile(dir.ds, file.Name())
+
+	if err != nil {
+		logrus.Errorf("An error occurred creating the file: %s", err.Error())
+		return nil, nil, fuse.EIO
+	}
 
 	return node, node, nil
 

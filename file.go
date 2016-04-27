@@ -19,12 +19,19 @@ type File struct {
 	synced   bool
 }
 
-func NewFile(ds *datastore.GridFSDataStore, name string) *File {
-	return &File{
-		ds:     ds,
-		name:   name,
-		synced: true,
+func NewFile(ds *datastore.GridFSDataStore, name string) (*File, error) {
+	tempname, err := util.TempFileName()
+
+	if err != nil {
+		return nil, err
 	}
+
+	return &File{
+		ds:       ds,
+		name:     name,
+		synced:   true,
+		tempfile: tempname,
+	}, nil
 }
 
 func (f *File) Attr(ctx context.Context, a *fuse.Attr) error {
@@ -63,15 +70,6 @@ func (f *File) ReadAll(ctx context.Context) ([]byte, error) {
 }
 
 func (f *File) Write(ctx context.Context, req *fuse.WriteRequest, resp *fuse.WriteResponse) error {
-	if req.Offset == 0 {
-		tempname, err := util.TempFileName()
-
-		if err != nil {
-			logrus.Errorf("An error occurred while creating a temporary filename for file %s", f.name)
-			return fuse.EIO
-		}
-		f.tempfile = tempname
-	}
 
 	logrus.Infof("Writing %s to tempfile: %s", f.name, f.tempfile)
 	file, err := os.OpenFile(f.tempfile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
@@ -102,6 +100,8 @@ func (f *File) Flush(ctx context.Context, req *fuse.FlushRequest) error {
 	if f.synced == true {
 		return nil
 	}
+
+	logrus.Infof("Sync file %s", f.name)
 
 	defer os.Remove(f.tempfile)
 	tempFile, err := os.Open(f.tempfile)
