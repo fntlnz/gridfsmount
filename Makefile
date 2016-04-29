@@ -7,5 +7,8 @@ dist/gridfsmount:
 
 build: dist/gridfsmount
 
+test:
+	go list ./... | grep -v /vendor  | xargs go test
+
 clean:
 	rm -Rf dist/
