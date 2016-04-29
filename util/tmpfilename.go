@@ -1,22 +1,15 @@
 package util
 
-import (
-	"crypto/rand"
-	"encoding/base64"
-	"fmt"
-	"os"
-)
+import "io/ioutil"
+import "os"
 
-const TEMP_FILE_NAME_RAND_LEN = 10
+const TEMP_FILE_NAME_PREFIX = "gridfs"
 
 func TempFileName() (string, error) {
-	b := make([]byte, TEMP_FILE_NAME_RAND_LEN)
-	_, err := rand.Read(b)
+	file, err := ioutil.TempFile(os.TempDir(), TEMP_FILE_NAME_PREFIX)
 	if err != nil {
 		return "", err
 	}
-	en := base64.StdEncoding
-	d := make([]byte, en.EncodedLen(len(b)))
-	en.Encode(d, b)
-	return fmt.Sprintf("%s/%s", os.TempDir(), d), nil
+	defer file.Close()
+	return file.Name(), nil
 }

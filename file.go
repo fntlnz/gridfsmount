@@ -34,6 +34,10 @@ func NewFile(ds *datastore.GridFSDataStore, name string) (*File, error) {
 	}, nil
 }
 
+func (f *File) Getxattr(ctx context.Context, req *fuse.GetxattrRequest, resp *fuse.GetxattrResponse) error {
+	return nil
+}
+
 func (f *File) Attr(ctx context.Context, a *fuse.Attr) error {
 
 	file, err := f.ds.FindByName(f.name)
@@ -71,7 +75,7 @@ func (f *File) ReadAll(ctx context.Context) ([]byte, error) {
 
 func (f *File) Write(ctx context.Context, req *fuse.WriteRequest, resp *fuse.WriteResponse) error {
 
-	logrus.Infof("Writing %s to tempfile: %s", f.name, f.tempfile)
+	logrus.Debugf("Writing %s to tempfile: %s", f.name, f.tempfile)
 	file, err := os.OpenFile(f.tempfile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 
 	if err != nil {
@@ -95,13 +99,13 @@ func (f *File) Write(ctx context.Context, req *fuse.WriteRequest, resp *fuse.Wri
 }
 
 func (f *File) Flush(ctx context.Context, req *fuse.FlushRequest) error {
-	logrus.Infof("Flushing file %s", f.name)
+	logrus.Debugf("Flushing file %s", f.name)
 
 	if f.synced == true {
 		return nil
 	}
 
-	logrus.Infof("Sync file %s", f.name)
+	logrus.Debugf("Sync file %s", f.name)
 
 	defer os.Remove(f.tempfile)
 	tempFile, err := os.Open(f.tempfile)

@@ -9,6 +9,7 @@ import (
 	"bazil.org/fuse/fs"
 	"github.com/Sirupsen/logrus"
 	"github.com/fntlnz/gridfsmount/datastore"
+	"github.com/fntlnz/gridfsmount/util"
 	"gopkg.in/mgo.v2"
 )
 
@@ -21,7 +22,7 @@ const (
 
 version: %s
 `
-	version = "0.1.0"
+	version = "0.1.0-dev"
 )
 
 var (
@@ -29,6 +30,7 @@ var (
 	dbName       string
 	gridFSPrefix string
 	mountPoint   string
+	debug        bool
 )
 
 func usage() {
@@ -41,11 +43,15 @@ func init() {
 	flag.StringVar(&dbName, "db", "gridfsmount", "The database to use to store the files collection")
 	flag.StringVar(&gridFSPrefix, "gridfs-prefix", "files", "The prefix that will be used by GridFS to create its collection")
 	flag.StringVar(&mountPoint, "mountpoint", "/tmp/gridfs", "Filesystem mountpoint")
+	flag.BoolVar(&debug, "debug", false, "Start in debug mode, provides a lot more information")
 	flag.Usage = usage
 	flag.Parse()
 }
 
 func main() {
+	if debug {
+		util.EnableDebug()
+	}
 
 	session, err := mgo.Dial(mongoUri)
 	if err != nil {
