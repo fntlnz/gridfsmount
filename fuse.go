@@ -1,22 +1,34 @@
 package main
 
 import (
+	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
-	"github.com/fntlnz/gridfsmount/datastore"
+	"github.com/fntlnz/gridfsmount/filesystem"
 )
 
-type GridFSFuse struct {
-	ds *datastore.GridFSDataStore
-}
+func MountAndServe(filesystem *filesystem.Filesystem, mountPoint string) error {
+	c, err := fuse.Mount(
+		mountPoint,
+		fuse.FSName("gridfs"),
+		fuse.LocalVolume(),
+	)
 
-func NewGridFSFuse(ds *datastore.GridFSDataStore) *GridFSFuse {
-	return &GridFSFuse{
-		ds: ds,
+	if err != nil {
+		return err
 	}
-}
 
-func (g *GridFSFuse) Root() (fs.Node, error) {
-	return &Dir{
-		ds: g.ds,
-	}, nil
+	defer c.Close()
+
+	err = fs.Serve(c, filesystem)
+
+	if err != nil {
+		return err
+	}
+
+	<-c.Ready
+
+	if err := c.MountError; err != nil {
+		return err
+	}
+	return nil
 }

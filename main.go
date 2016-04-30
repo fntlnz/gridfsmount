@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"bazil.org/fuse"
-	"bazil.org/fuse/fs"
 	"github.com/Sirupsen/logrus"
 	"github.com/fntlnz/gridfsmount/datastore"
+	"github.com/fntlnz/gridfsmount/filesystem"
 	"github.com/fntlnz/gridfsmount/util"
 	"gopkg.in/mgo.v2"
 )
@@ -61,29 +60,6 @@ func main() {
 	ds := datastore.NewGridFSDataStore(session, dbName, gridFSPrefix)
 	defer ds.Close()
 
-	gridFSFuse := NewGridFSFuse(ds)
-
-	c, err := fuse.Mount(
-		mountPoint,
-		fuse.FSName("gridfs"),
-		fuse.LocalVolume(),
-	)
-
-	if err != nil {
-		logrus.Fatal(err)
-	}
-
-	defer c.Close()
-
-	err = fs.Serve(c, gridFSFuse)
-
-	if err != nil {
-		logrus.Fatal(err)
-	}
-
-	<-c.Ready
-
-	if err := c.MountError; err != nil {
-		logrus.Fatal(err)
-	}
+	fs := filesystem.NewFilesystem(ds)
+	MountAndServe(fs, mountPoint)
 }

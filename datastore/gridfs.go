@@ -16,29 +16,29 @@ func NewGridFSDataStore(session *mgo.Session, dbName string, prefix string) *Gri
 	}
 }
 
-func (ds *GridFSDataStore) dataStore() *GridFSDataStore {
+func (ds *GridFSDataStore) copy() *GridFSDataStore {
 	return NewGridFSDataStore(ds.session.Copy(), ds.dbName, ds.prefix)
 }
 
 func (ds *GridFSDataStore) db() *mgo.Database {
-	return ds.dataStore().session.DB(ds.dbName)
+	return ds.copy().session.DB(ds.dbName)
 }
 
-func (ds *GridFSDataStore) GridFS() *mgo.GridFS {
+func (ds *GridFSDataStore) gridFS() *mgo.GridFS {
 	return ds.db().GridFS(ds.prefix)
 }
 
 func (ds *GridFSDataStore) FindByName(name string) (*mgo.GridFile, error) {
-	return ds.GridFS().Open(name)
+	return ds.gridFS().Open(name)
 }
 
 func (ds *GridFSDataStore) Create(name string) (*mgo.GridFile, error) {
-	return ds.GridFS().Create(name)
+	return ds.gridFS().Create(name)
 }
 
 func (ds *GridFSDataStore) ListFileNames() ([]string, error) {
 	var result []string
-	err := ds.GridFS().Find(nil).Distinct("filename", &result)
+	err := ds.gridFS().Find(nil).Distinct("filename", &result)
 	if err != nil {
 		return nil, err
 	}
