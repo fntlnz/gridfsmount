@@ -22,7 +22,8 @@ const (
 
 version: %s
 `
-	version = "0.2.0"
+	// Remove -dev on release
+	version = "0.2.1-dev"
 )
 
 var (

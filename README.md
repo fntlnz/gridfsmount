@@ -1,7 +1,5 @@
 # GridFS Mount
 
-![https://github.com/fntlnz/gridfsmount/releases/tag/0.2.0](https://img.shields.io/badge/Linux%20x86_64-v0.2.0-blue.svg)
-
 This is a tool to mount a GridFS collection as a [**Filesystem in Userspace**](https://en.wikipedia.org/wiki/Filesystem_in_Userspace) or as a **Docker volume**.
 
 Please note that this tool is not complete yet and is subject to change.
