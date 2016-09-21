@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/fntlnz/gridfsmount/datastore"
@@ -13,7 +14,7 @@ import (
 )
 
 const (
-	BANNER = `____ ____ _ ___  ____ ____ _  _ ____ _  _ _  _ ___
+	banner = `____ ____ _ ___  ____ ____ _  _ ____ _  _ _  _ ___
 | __ |__/ | |  \ |___ [__  |\/| |  | |  | |\ |  |
 |__] |  \ | |__/ |    ___] |  | |__| |__| | \|  |
 
@@ -25,21 +26,25 @@ version: %s
 )
 
 var (
-	mongoUri     string
+	mongoAddrs   util.ArrayFlags
 	dbName       string
+	dbUsername   string
+	dbPassword   string
 	gridFSPrefix string
 	mountPoint   string
 	debug        bool
 )
 
 func usage() {
-	fmt.Fprintf(os.Stderr, BANNER, version)
+	fmt.Fprintf(os.Stderr, banner, version)
 	flag.PrintDefaults()
 }
 
 func init() {
-	flag.StringVar(&mongoUri, "mongouri", "127.0.0.1:27017", "Mongo endpoint")
+	flag.Var(&mongoAddrs, "addr", "List of MongoDB database addresses")
 	flag.StringVar(&dbName, "db", "gridfsmount", "The database to use to store the files collection")
+	flag.StringVar(&dbUsername, "username", "", "Username to connect to the database")
+	flag.StringVar(&dbPassword, "password", "", "Password to connect to the database")
 	flag.StringVar(&gridFSPrefix, "gridfs-prefix", "files", "The prefix that will be used by GridFS to create its collection")
 	flag.StringVar(&mountPoint, "mountpoint", "/tmp/gridfs", "Filesystem mountpoint")
 	flag.BoolVar(&debug, "debug", false, "Start in debug mode, provides a lot more information")
@@ -52,7 +57,15 @@ func main() {
 		util.EnableDebug()
 	}
 
-	session, err := mgo.Dial(mongoUri)
+	mongoDBDialInfo := &mgo.DialInfo{
+		Addrs:    mongoAddrs,
+		Timeout:  60 * time.Second,
+		Database: dbName,
+		Username: dbUsername,
+		Password: dbPassword,
+	}
+
+	session, err := mgo.DialWithInfo(mongoDBDialInfo)
 	if err != nil {
 		logrus.Fatal(err)
 	}
